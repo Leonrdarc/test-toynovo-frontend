@@ -7,7 +7,7 @@
     margin-bottom: 1em;
     input{
         height: 40px;
-        padding: 14px 16px 0 10px;
+        padding: 14px 10px 0 10px;
         outline: 0;
         margin: 2px;
         border: 1px solid #ddd;
@@ -16,6 +16,26 @@
         font-size: 16px;
         transition: all 300ms ease-out;
     }
+    .textareaWrapper{
+        display: flex;
+        padding-top: 26px;
+        margin: 2px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: #fff;
+        transition: all 300ms ease-out;
+        textarea{
+            padding: 0 10px;
+            outline: 0;
+            width: 100%;
+            border: 0px solid #ddd;
+            border-radius: 4px;
+            background: transparent;
+            font-size: 16px;
+            transition: all 300ms ease-out;
+        }
+    }
+    
     label{
         font-size: 16px;
         padding: 0 12px;
@@ -29,7 +49,7 @@
     .Active{
         font-weight: bold;
         color: $primary-color;
-        transform: translate(0, 8px) scale(0.75);
+        transform: translate(4px, 8px) scale(0.75);
     }
     &:focus-within {
         input{
@@ -39,7 +59,11 @@
         label{
             font-weight: bold;
             color: $primary-color;
-            transform: translate(0, 8px) scale(0.75);
+            transform: translate(4px, 8px) scale(0.75);
+        }
+        .textareaWrapper{
+            border: 3px solid $primary-color;
+            margin: 0;
         }
     }
 }

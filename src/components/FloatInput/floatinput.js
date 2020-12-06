@@ -1,21 +1,28 @@
 import { useState } from 'react';
 import './floatinput.scss';
 
-function FloatInput({label, onChange}){
-    const [isActive, setIsActive] = useState(false);
+function FloatInput({label, onChange, defaultValue, rows}){
+    const [isActive, setIsActive] = useState(defaultValue?true:false);
 
-    const onTextChange = (text) => {
-        onChange(text); 
+    const onTextChange = (event) => {
+        const text = event.target.value;
         if (text !== "") {
             setIsActive(true);
         } else {
             setIsActive(false);
         }
+        onChange(text)
     }
 
     return (
         <div className="float-label">
-            <input type="email" onChange={onTextChange} />
+            {rows?
+                <div className="textareaWrapper">
+                    <textarea rows={`${rows}`} onChange={onTextChange} defaultValue={defaultValue}/>
+                </div>
+            :
+                <input onChange={onTextChange} defaultValue={defaultValue}/>
+            }
             <label className={isActive?"Active":""} htmlFor="email">
                 {label}
             </label>

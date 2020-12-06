@@ -1,10 +1,10 @@
-import logo from './logo.svg';
 import './App.scss';
 import { useEffect, useState } from 'react';
-import { API } from './services/API_Service';
-import { MdAdd, MdClose, MdDelete, MdEdit } from 'react-icons/md';
+import { API, API_URL } from './services/API_Service';
+import { MdAdd, MdCheck, MdClose, MdDelete, MdEdit } from 'react-icons/md';
 import Modal from 'react-modal';
 import FloatInput from './components/FloatInput/floatinput';
+import ImageUploader from './components/ImageUploader/imageuploader';
 
 //Set Modal to root element
 Modal.setAppElement('#root')
@@ -14,19 +14,40 @@ function App() {
   const [modalIsOpen,setIsOpen] = useState(false);
   const [modalTitle,setModalTitle] = useState("");
   const [name,setName] = useState("");
+  const [price,setPrice] = useState("");
   const [description,setDescription] = useState("");
-  
+  const [img,setImg] = useState("");
+  const [selectedToy,setSelectedToy] = useState(null);
+  const [deleting,setDeleting] = useState(false);
+
   useEffect(() => {
     getAllToys();
   }, []);
 
   //Modal functions
-  const openModal = (title) => {
+  const openModal = (title, toy) => {
     setModalTitle(title);
+    switch (title) {
+      case "Crear Juguete":
+        setSelectedToy(null);
+        setDeleting(false);
+      break;
+      case "Editar Juguete":
+        setSelectedToy(toy);
+        setDeleting(false);
+      break;
+      case "Borrar Juguete":
+        setSelectedToy(toy)
+        setDeleting(true);
+      break;
+      default:
+        break;
+    }
     setIsOpen(true);
   }
 
   const closeModal = () => {
+    resetInputStates();
     setIsOpen(false);
   }
 
@@ -36,6 +57,45 @@ function App() {
     .then(response => {
       setToys(response.data);
     })
+  }
+
+  const resetInputStates = () => {
+    setName("");
+    setDescription("");
+    setPrice("");
+    setImg(null);
+  }
+
+  //Submit Handle
+  const handleSubmitButton = () => {
+    const form = new FormData();
+    if(deleting){
+      API.delete("toy",{ params: { id: selectedToy.id}})
+      .then(response => {
+        getAllToys();
+        closeModal();
+      })
+    }else if(selectedToy){
+      name!==""&&form.append('name', name);
+      description!==""&&form.append('description', description);
+      price!==""&&form.append('price', parseFloat(price));
+      img&&form.append('img', img);
+      API.put("toy",form,{ params: { id: selectedToy.id}})
+      .then(response => {
+        getAllToys();
+        closeModal();
+      })
+    }else{
+      form.append('name', name);
+      form.append('description', description);
+      form.append('price', parseFloat(price));
+      form.append('img', img);
+      API.post("toy",form)
+      .then(response => {
+        getAllToys();
+        closeModal();
+      })
+    }
   }
 
   return (
@@ -51,37 +111,44 @@ function App() {
           <MdAdd size={20} className="add-icon"/>
           <span>Agregar Juguete</span>
         </div>
-        <table className="toys-table">
-          <tbody>
-            <tr>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th>Precio</th>
-              <th>Imagen</th>
-              <th>Acciones</th>
-            </tr>
-            {toys.map(toy=>(
-              <tr key={toy.id}>
-                <td>{toy.title}</td>
-                <td>{toy.description}</td>
-                <td>{toy.img}</td>
-                <td>{toy.img}</td>
-                <td style={{width: "160px"}}>
-                  <div className="actions">
-                    <div className="actionButton editar" onClick={()=>openModal("Editar Juguete")}>
-                      <MdEdit size={20} />
-                      <span>Editar</span>
-                    </div>
-                    <div className="actionButton delete" onClick={()=>openModal("Borrar Juguete")}>
-                      <MdDelete size={20} />
-                      <span>Borrar</span>
-                    </div>
-                  </div>
-                </td>
+        {toys.length>0?
+          <table className="toys-table">
+            <tbody>
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th className="center">Imagen</th>
+                <th className="center">Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              {toys.map(toy=>(
+                <tr key={toy.id}>
+                  <td>{toy.name}</td>
+                  <td>{toy.description}</td>
+                  <td>{toy.price}</td>
+                  <td style={{width: "100px"}}>
+                    <img style={{maxHeight:"50px", width: "100%", objectFit: "contain"}} src={API_URL+"toy/"+toy.img} alt="error"/>
+                  </td>
+                  <td style={{width: "160px"}}>
+                    <div className="actions">
+                      <div className="actionButton editar" onClick={()=>openModal("Editar Juguete", toy)}>
+                        <MdEdit size={20} />
+                        <span>Editar</span>
+                      </div>
+                      <div className="actionButton delete" onClick={()=>openModal("Borrar Juguete", toy)}>
+                        <MdDelete size={20} />
+                        <span>Borrar</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        :
+          <h3>No hay registros que mostrar</h3>
+        }
+        
       </header>
       <Modal 
         isOpen={modalIsOpen}
@@ -89,18 +156,47 @@ function App() {
         className="Modal"
         overlayClassName="Overlay"
       >
+        {/* Close Icon */}
         <div className="close" onClick={closeModal}>
           <MdClose size={25}/>
         </div>
+        {/* Modal Content */}
         <h2>{modalTitle}</h2>
-        <FloatInput
-          label="Nombre"
-          onChange={(text)=>setName(text)}
-        />
-        <FloatInput
-          label="Descripción"
-          onChange={(text)=>setName(text)}
-        />
+        {!deleting?
+          <>
+            <FloatInput
+              label="Nombre"
+              defaultValue={selectedToy?.name}
+              onChange={(text)=>setName(text)}
+            />
+            <FloatInput
+              label="Descripción"
+              rows={5}
+              defaultValue={selectedToy?.description}
+              onChange={(text)=>setDescription(text)}
+            />
+            <FloatInput
+              label="Precio (COP)"
+              defaultValue={selectedToy?.price}
+              onChange={(text)=>setPrice(text)}
+            />
+            <ImageUploader 
+              imgUrl={selectedToy?API_URL+"toy/"+selectedToy.img:null}
+              setParentImg={setImg}
+            />
+          </>
+        :
+          <span>{"Seguro quiere eliminar el juguete "+selectedToy?.name+"?"}</span>
+        }
+        
+        <div className="submitButton" onClick={handleSubmitButton}>
+          {deleting?
+            <MdDelete size={20}/>
+          :
+            <MdCheck size={20}/>
+          }
+          <span className="labelText">{deleting?"Eliminar":"Aceptar"}</span>
+        </div>
       </Modal>
     </div>
   );
