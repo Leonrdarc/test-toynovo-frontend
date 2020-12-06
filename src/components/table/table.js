@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
-
-export default class Table extends Component {
-  render() {
-    return (
-      <div> textInComponent </div>
-    );
-  }
+function Table({}) {
+  return (
+    <div> textInComponent </div>
+  );
 }
+
+export default Table;
