@@ -98,10 +98,12 @@ h2{
   padding: 6px;
   font-weight: bold;
   border-radius: 7px;
-  background-color: red;
+  background-color: $primary-color;
+  color: white;
   transition: all 300ms ease-out;
   &:hover{
-    background-color: yellow;
+    background-color: $secondary-color;
+    color: $third-color;
   }
 }
 
