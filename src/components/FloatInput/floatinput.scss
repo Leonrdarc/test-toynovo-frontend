@@ -1,0 +1,45 @@
+@import "src/App";
+
+.float-label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+    input{
+        height: 40px;
+        padding: 14px 16px 0 10px;
+        outline: 0;
+        margin: 2px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: #fff;
+        font-size: 16px;
+        transition: all 300ms ease-out;
+    }
+    label{
+        font-size: 16px;
+        padding: 0 12px;
+        color: #999;
+        pointer-events: none;
+        position: absolute;
+        transform: translate(0, 17px) scale(1);
+        transform-origin: top left;
+        transition: all 0.2s ease-out;
+    }
+    .Active{
+        font-weight: bold;
+        color: $primary-color;
+        transform: translate(0, 8px) scale(0.75);
+    }
+    &:focus-within {
+        input{
+            border: 3px solid $primary-color;
+            margin: 0;
+        }
+        label{
+            font-weight: bold;
+            color: $primary-color;
+            transform: translate(0, 8px) scale(0.75);
+        }
+    }
+}

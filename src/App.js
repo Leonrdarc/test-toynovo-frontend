@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { API } from './services/API_Service';
 import { MdAdd, MdClose, MdDelete, MdEdit } from 'react-icons/md';
 import Modal from 'react-modal';
+import FloatInput from './components/FloatInput/floatinput';
 
 //Set Modal to root element
 Modal.setAppElement('#root')
@@ -12,6 +13,8 @@ function App() {
   const [toys, setToys] = useState([]);
   const [modalIsOpen,setIsOpen] = useState(false);
   const [modalTitle,setModalTitle] = useState("");
+  const [name,setName] = useState("");
+  const [description,setDescription] = useState("");
   
   useEffect(() => {
     getAllToys();
@@ -88,9 +91,16 @@ function App() {
       >
         <div className="close" onClick={closeModal}>
           <MdClose size={25}/>
-          
         </div>
         <h2>{modalTitle}</h2>
+        <FloatInput
+          label="Nombre"
+          onChange={(text)=>setName(text)}
+        />
+        <FloatInput
+          label="Descripción"
+          onChange={(text)=>setName(text)}
+        />
       </Modal>
     </div>
   );
